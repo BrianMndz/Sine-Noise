@@ -18,8 +18,8 @@ MainComponent::MainComponent()
     }
     else
     {
-        // Specify the number of input and output channels that we want to open
-        setAudioChannels (2, 2);
+        // No inputs, two outputs
+        setAudioChannels (0, 2);
     }
 }
 
@@ -39,29 +39,23 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    bufferToFill.clearActiveBufferRegion();
+    //bufferToFill.clearActiveBufferRegion();
     
     auto currentLevel = gainComponent.mainLevel;
-    
-    auto* localBuffer = bufferToFill.buffer;
-    auto numChannels = localBuffer->getNumChannels();
-    auto numSamples = localBuffer->getNumSamples();
-    
-    for(auto chan = 0; chan < numChannels; ++chan)
-    {
-        auto* writePointer = localBuffer->getWritePointer(chan);
+    auto* leftBuffer  = bufferToFill.buffer->getWritePointer (0, bufferToFill.startSample);
+    auto* rightBuffer = bufferToFill.buffer->getWritePointer (1, bufferToFill.startSample);
         
-        for(auto sample = 0; sample < numSamples; ++sample)
-        {
-            /** For each output sample we calculate the sine function for current angle.
-             * then increment the angle for the next sample */
-            auto currentSample = (float) std::sin (synthComponent.currentAngle);
-            synthComponent.currentAngle += synthComponent.angleDelta;
-            auto output = currentSample * currentLevel;
-            writePointer[sample] = output;
-            //Code commented to produce noise
-            //auto output = randomGen.nextFloat() * currentLevel;*/
-        }
+    for(auto sample = 0; sample < bufferToFill.numSamples; ++sample)
+    {
+        /** For each output sample we calculate the sine function for current angle.
+         * then increment the angle for the next sample */
+        auto currentSample = (float) std::sin (synthComponent.currentAngle);
+        synthComponent.currentAngle += synthComponent.angleDelta;
+        auto output = currentSample * currentLevel;
+        leftBuffer[sample] = output;
+        rightBuffer[sample] = output;
+        //Code commented to produce noise
+        //auto output = randomGen.nextFloat() * currentLevel;*/
     }
 }
 
@@ -75,8 +69,6 @@ void MainComponent::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    // You can add your drawing code here!
 }
 
 void MainComponent::resized()

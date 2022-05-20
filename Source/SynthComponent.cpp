@@ -17,6 +17,7 @@ SynthComponent::SynthComponent()
     addAndMakeVisible(freqSlider);
     freqSlider.setRange(50.0, 5000.0);
     freqSlider.setSkewFactorFromMidPoint(500.0);
+    freqSlider.setValue(currentFreq, juce::dontSendNotification);
     /**The lambda function to start only if we have a valid sample Rate */
     freqSlider.onValueChange = [this] {
         if (currentSampleRate > 0.0) updateAngleDelta();

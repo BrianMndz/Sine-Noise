@@ -27,6 +27,8 @@ public:
     void updateAngleDelta();
     
     double currentSampleRate = 0.0, currentAngle = 0.0, angleDelta = 0.0;
+    /**Adding component to remove artifacts */
+    double currentFreq = 500.0, targetFreq = 500.0;
 
 private:
     juce::Slider freqSlider;
