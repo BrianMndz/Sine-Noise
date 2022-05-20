@@ -27,6 +27,8 @@ public:
     
 private:
     GainComponent gainComponent;
+    
+    juce::Random randomGen;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)

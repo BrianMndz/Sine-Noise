@@ -37,8 +37,8 @@ void GainComponent::paint (juce::Graphics& g)
 
 void GainComponent::resized()
 {
-    decibelGainSlider.setBounds(20, 20, getWidth() - 40, getHeight() - 40);
-    decibelLabel.setBounds(30, getHeight() - 40, 120, 20);
+    decibelGainSlider.setBounds(-25, 30, getWidth() - 110, getHeight() - 110);
+    decibelLabel.setBounds(85, getHeight() - 75, 120, 20);
 
 }
 
