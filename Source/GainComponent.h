@@ -48,7 +48,7 @@ public:
     void resized() override;
     
     /**Let's check if we can update this float (representing the vol level) with the decibel slider component */
-    float mainLevel = 0.0f;
+    float mainLevel = 0.05f;
 private:
     /**Create the gain stage in the plug in. Lets create it directly in decibel control */
     DecibelSlider decibelGainSlider;

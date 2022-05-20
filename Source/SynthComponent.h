@@ -23,7 +23,14 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
+    /**Added a function to change the angle*/
+    void updateAngleDelta();
+    
+    double currentSampleRate = 0.0, currentAngle = 0.0, angleDelta = 0.0;
 
 private:
+    juce::Slider freqSlider;
+    
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthComponent)
 };

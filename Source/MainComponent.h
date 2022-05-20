@@ -27,6 +27,7 @@ public:
     
 private:
     GainComponent gainComponent;
+    SynthComponent synthComponent;
     
     juce::Random randomGen;
 

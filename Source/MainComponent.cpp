@@ -4,6 +4,7 @@
 MainComponent::MainComponent()
 {
     addAndMakeVisible(gainComponent);
+    addAndMakeVisible(synthComponent);
     // Make sure you set the size of the component after
     // you add any child components.
     setSize (800, 600);
@@ -29,8 +30,11 @@ MainComponent::~MainComponent()
 }
 
 //==============================================================================
+/**We need to know the output sample rate. How frequently the samples are being generated */
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
+    synthComponent.currentSampleRate = sampleRate;
+    synthComponent.updateAngleDelta();
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
@@ -49,8 +53,14 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
         
         for(auto sample = 0; sample < numSamples; ++sample)
         {
-            auto output = randomGen.nextFloat() * currentLevel;
+            /** For each output sample we calculate the sine function for current angle.
+             * then increment the angle for the next sample */
+            auto currentSample = (float) std::sin (synthComponent.currentAngle);
+            synthComponent.currentAngle += synthComponent.angleDelta;
+            auto output = currentSample * currentLevel;
             writePointer[sample] = output;
+            //Code commented to produce noise
+            //auto output = randomGen.nextFloat() * currentLevel;*/
         }
     }
 }
@@ -72,4 +82,5 @@ void MainComponent::paint (juce::Graphics& g)
 void MainComponent::resized()
 {
     gainComponent.setBounds(getWidth() / 2, getHeight() / 2, getWidth() / 2, getHeight() / 2);
+    synthComponent.setBounds(0, 0, getWidth(), getHeight() / 2);
 }

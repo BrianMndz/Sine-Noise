@@ -14,8 +14,13 @@
 //==============================================================================
 SynthComponent::SynthComponent()
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
+    addAndMakeVisible(freqSlider);
+    freqSlider.setRange(50.0, 5000.0);
+    freqSlider.setSkewFactorFromMidPoint(500.0);
+    /**The lambda function to start only if we have a valid sample Rate */
+    freqSlider.onValueChange = [this] {
+        if (currentSampleRate > 0.0) updateAngleDelta();
+    };
 
 }
 
@@ -25,27 +30,16 @@ SynthComponent::~SynthComponent()
 
 void SynthComponent::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
-
-    g.setColour (juce::Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("SynthComponent", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+    g.fillAll (juce::Colours::darkgrey);   
 }
 
 void SynthComponent::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
+    freqSlider.setBounds(30, getHeight() / 4, getWidth() - 75, getHeight() - 100);
+}
 
+void SynthComponent::updateAngleDelta()
+{
+    auto cyclesPerSample = freqSlider.getValue() / currentSampleRate;   //Calculate the number of cycles to complete for each output sample.
+    angleDelta = cyclesPerSample * 2.0 * juce::MathConstants<double>::pi;   //Multiplied by length of a whole sine wave cycle (2pi Rad)
 }
