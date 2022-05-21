@@ -39,7 +39,6 @@ void GainComponent::resized()
 {
     decibelGainSlider.setBounds(-25, 30, getWidth() - 110, getHeight() - 110);
     decibelLabel.setBounds(85, getHeight() - 75, 120, 20);
-
 }
 
 

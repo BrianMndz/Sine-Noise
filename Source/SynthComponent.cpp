@@ -20,9 +20,8 @@ SynthComponent::SynthComponent()
     freqSlider.setValue(currentFreq, juce::dontSendNotification);
     /**The lambda function to start only if we have a valid sample Rate */
     freqSlider.onValueChange = [this] {
-        if (currentSampleRate > 0.0) updateAngleDelta();
+        targetFreq = freqSlider.getValue();
     };
-
 }
 
 SynthComponent::~SynthComponent()

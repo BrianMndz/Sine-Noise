@@ -39,24 +39,51 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    //bufferToFill.clearActiveBufferRegion();
+    bufferToFill.clearActiveBufferRegion();
     
-    auto currentLevel = gainComponent.mainLevel;
     auto* leftBuffer  = bufferToFill.buffer->getWritePointer (0, bufferToFill.startSample);
     auto* rightBuffer = bufferToFill.buffer->getWritePointer (1, bufferToFill.startSample);
-        
-    for(auto sample = 0; sample < bufferToFill.numSamples; ++sample)
+    
+    /**Adding a smoothing change in frequencies */
+    auto localTargetFreq = synthComponent.targetFreq;
+    
+    if(localTargetFreq != synthComponent.currentFreq)
     {
-        /** For each output sample we calculate the sine function for current angle.
-         * then increment the angle for the next sample */
-        auto currentSample = (float) std::sin (synthComponent.currentAngle);
-        synthComponent.currentAngle += synthComponent.angleDelta;
-        auto output = currentSample * currentLevel;
-        leftBuffer[sample] = output;
-        rightBuffer[sample] = output;
-        //Code commented to produce noise
-        //auto output = randomGen.nextFloat() * currentLevel;*/
+        /**Calculate the required increment per sample */
+        auto freqIncrement = (localTargetFreq - synthComponent.currentFreq) / bufferToFill.numSamples;
+        
+        for(auto sample = 0; sample < bufferToFill.numSamples; ++sample)
+        {
+            /** For each output sample we calculate the sine function for current angle.
+             * then increment the angle for the next sample */
+            auto currentSample = (float) std::sin (synthComponent.currentAngle);
+            synthComponent.currentFreq += freqIncrement;    //Increment the current frequency
+            synthComponent.updateAngleDelta();              //Update the angle based on the new frequency.
+            synthComponent.currentAngle += synthComponent.angleDelta;
+            auto output = currentSample;
+            leftBuffer[sample] = output;
+            rightBuffer[sample] = output;
+        }
+        
+        synthComponent.currentFreq = localTargetFreq;
     }
+    else
+    {
+        for(auto sample = 0; sample < bufferToFill.numSamples; ++sample)
+        {
+            /** For each output sample we calculate the sine function for current angle.
+             * then increment the angle for the next sample */
+            auto currentSample = (float) std::sin (synthComponent.currentAngle);
+            synthComponent.currentAngle += synthComponent.angleDelta;
+            auto output = currentSample;
+            leftBuffer[sample] = output;
+            rightBuffer[sample] = output;
+        }
+    }
+    
+    auto localTargetLevel = gainComponent.mainLevel;
+    bufferToFill.buffer->applyGainRamp(bufferToFill.startSample, bufferToFill.numSamples, gainComponent.mainLevel, localTargetLevel);
+    gainComponent.mainLevel = localTargetLevel;
 }
 
 void MainComponent::releaseResources()
